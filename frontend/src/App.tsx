@@ -1,16 +1,17 @@
-import '@/styles/globals.css';
+import './styles/globals.css';
 import { useState } from 'react';
 import { Workflow, WorkflowGraph } from './types';
 import { WorkflowParser } from './components/WorkflowParser';
 import { DAGVisualization } from './components/DAGVisualization';
 import { TimelineView } from './components/TimelineView';
 import { JobDetails } from './components/JobDetails';
+import { WorkflowExplanation } from './components/WorkflowExplanation';
 
 function App() {
   const [workflow, setWorkflow] = useState<Workflow | null>(null);
   const [graph, setGraph] = useState<WorkflowGraph | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | undefined>();
-  const [activeView, setActiveView] = useState<'dag' | 'timeline'>('dag');
+  const [activeView, setActiveView] = useState<'dag' | 'timeline' | 'explain'>('dag');
 
   const handleParsed = (data: { workflow: Workflow; graph: WorkflowGraph }) => {
     setWorkflow(data.workflow);
@@ -42,24 +43,33 @@ function App() {
             {workflow && graph ? (
               <>
                 {/* View Toggle */}
-                <div className="flex gap-2 bg-white rounded-lg p-2 shadow-lg">
+                <div className="flex flex-wrap gap-2 bg-white rounded-lg p-2 shadow-lg">
                   <button
                     onClick={() => setActiveView('dag')}
-                    className={`flex-1 py-2 px-4 rounded font-semibold transition-colors ${activeView === 'dag'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    className={`flex-1 min-w-[140px] py-2 px-4 rounded font-semibold transition-colors ${activeView === 'dag'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                   >
                     📊 Dependency Graph
                   </button>
                   <button
                     onClick={() => setActiveView('timeline')}
-                    className={`flex-1 py-2 px-4 rounded font-semibold transition-colors ${activeView === 'timeline'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    className={`flex-1 min-w-[140px] py-2 px-4 rounded font-semibold transition-colors ${activeView === 'timeline'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                   >
                     ⏱️ Execution Timeline
+                  </button>
+                  <button
+                    onClick={() => setActiveView('explain')}
+                    className={`flex-1 min-w-[140px] py-2 px-4 rounded font-semibold transition-colors ${activeView === 'explain'
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                  >
+                    🧠 Explain YAML
                   </button>
                 </div>
 
@@ -73,13 +83,17 @@ function App() {
                         onJobSelect={setSelectedJobId}
                       />
                     </div>
-                  ) : (
+                  ) : activeView === 'timeline' ? (
                     <div>
                       <TimelineView
                         graph={graph}
                         selectedJobId={selectedJobId}
                         onJobSelect={setSelectedJobId}
                       />
+                    </div>
+                  ) : (
+                    <div className="p-6">
+                      <WorkflowExplanation workflow={workflow} graph={graph} />
                     </div>
                   )}
                 </div>

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Workflow, WorkflowGraph } from '../types';
-import { Badge } from './Badge';
 
 interface WorkflowParserProps {
   onParsed: (data: { workflow: Workflow; graph: WorkflowGraph }) => void;
